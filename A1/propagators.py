@@ -1,7 +1,7 @@
 # =============================
-# Student Names:
-# Group ID:
-# Date:
+# Student Names: 
+# Group ID: 50
+# Date: January 31st, 2023
 # =============================
 # CISC 352 - W23
 # propagators.py
