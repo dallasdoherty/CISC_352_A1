@@ -150,3 +150,5 @@ def prop_GAC(csp, newVar=None):
                             if (cons not in GAC_queue):
                                 GAC_queue.append(cons)
     return True, pruned
+
+#change
