@@ -91,59 +91,63 @@ def prop_FC(csp, newVar=None):
     '''Do forward checking. That is check constraints with
        only one uninstantiated variable. Remember to keep
        track of all pruned variable,value tuple_valss and return '''
-    #IMPLEMENT
-    pruned_vals = []
+    pruned = []
     constraints = []
+    
+    # If newVar is None, forward check all constraints
+    if(newVar == None):
+        constraints = csp.get_all_cons()
+    # Otherwise only check constraints containing newVar
+    else:
+        constraints = csp.get_cons_with_var(newVar)
+    for cons in constraints:
+        # Only checking constraints that have one unassigned variable in their scope
+        if cons.get_n_unasgn() == 1:
+            var = cons.get_unasgn_vars()[0]
+            # Iterate through the other variables that are connected to var (unassigned)
+            for val in var.cur_domain():    
+                # Check if a satisfying tuple_vals exists          
+                if not cons.check_var_val(var, val):
+                    tuple_vals = (var, val)
+                    if(tuple_vals not in pruned):
+                        pruned.append(tuple_vals)
+                        var.prune_value(val)
+            # No possible assignements, this is considered failure. Now have to backtrack
+            if var.cur_domain_size() == 0:
+                return False, pruned
+    return True, pruned
 
+
+def prop_GAC(csp, newVar=None):
+    '''Do GAC propagation. If newVar is None we do initial GAC enforce
+       processing all constraints. Otherwise we do GAC enforce with
+       constraints containing newVar on GAC Queue'''
+    pruned = []
+    GAC_queue = []
+    
     if(newVar == None):
         constraints = csp.get_all_cons()
     else:
         constraints = csp.get_cons_with_var(newVar)
     
     for c in constraints:
-        if c.get_n_unasgn() == 1:
-            var = c.get_unasgn_vars()[0]
-
-            for d in var.cur_domain():
-                if not c.has_support(var,d):
-                    pair = (var,d)
-                    if(pair not in pruned_vals):
-                        pruned_vals.append(pair)
-                        var.prune_value(d)
-            if var.cur_domain_size() ==0:
-                return False, pruned_vals
-    return True, pruned_vals
-
-def prop_GAC(csp, newVar=None):
-    '''Do GAC propagation. If newVar is None we do initial GAC enforce
-       processing all constraints. Otherwise we do GAC enforce with
-       constraints containing newVar on GAC Queue'''
-    #IMPLEMENT
-    pruned_vals = []
-    GAC_queue = []
-
-    if(newVar == None):
-        constraints = csp.get_all_cons()
-    else:
-        constraints = csp.get_cons_with_var(newVar)
-
-    for c in constraints:
         GAC_queue.append(c)
-
+    
     while len(GAC_queue) != 0:
         c = GAC_queue.pop(0)
         for var in c.get_scope():
             for d in var.cur_domain():
-                if not c.has_support(var, d):
-                    pair = (var,d)
-                    if(pair not in pruned_vals):
-                        pruned_vals.append(pair)
+                if not c.check_var_val(var, d):
+                    tuple_vals = (var, d)
+                    if(tuple_vals not in pruned):
+                        pruned.append(tuple_vals)
                         var.prune_value(d)
                     if var.cur_domain_size() == 0:
                         GAC_queue.clear()
-                        return False, pruned_vals
+                        return False, pruned
                     else:
                         for cons in csp.get_cons_with_var(var):
                             if (cons not in GAC_queue):
                                 GAC_queue.append(cons)
-    return True, pruned_vals 
+    return True, pruned
+
