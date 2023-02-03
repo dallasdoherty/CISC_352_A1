@@ -29,54 +29,39 @@ var_ordering == a function with the following template
 def ord_dh(csp):
     ''' return variables according to the Degree Heuristic '''
     # IMPLEMENT
-    # have a dict of all variables
-    # get list of unassigned variables, iterate through each one getting list of variables in constraint
-    # for each value in constraint, update corresponding value and dictionary
-    # return max value of dict (variable that appears the most in constraints of other variables)
-    all_vars = csp.get_all_unasgn_vars()
-    # print("all vars dh ", all_vars)
-    # if everything is assigned except for the last variable, return that variable
-    if len(all_vars) == 1:
-        return all_vars[0]
-    var_dict = {}
-    # Iterate through all constraints
-    for cons in csp.get_all_cons():
-        # print("unassigned: ", cons.get_unasgn_vars())
-        # Iterate through unassigned variables in these constraints
-        for var in cons.get_unasgn_vars():
-            # Add the variable to var_dict when it appears
-            if var in var_dict:
-                var_dict[var] += 1
-            else:
-                var_dict[var] = 0
-    # print("var dict: ", var_dict)
-    # Return the most constrained variable
-    max_key = max(var_dict, key=var_dict.get)
-    # print(max_key)
-    return max_key
+    count = {}
 
+    vars = csp.get_all_unasgn_vars()
+    for v in vars:
 
-    
+        #add v to dictionary as key
+        count[v] = 0
+
+        #loop through list of all constraints in the CSP w/h v
+        for c in csp.get_all_cons_with_var(v):
+            if c.get_n_unasgn() != 0:
+                for uv in c.get_unasgn_vars():
+                    if uv != v:
+                        count[v] += 1
+    val = list(count.values())
+
+    key = list(count.keys())
+    dh_var = key[val.index(max(val))]
+
+    return dh_var   
 
 def ord_mrv(csp):
     ''' return variable according to the Minimum Remaining Values heuristic '''
     # IMPLEMENT
-    # return the variable with the fewest legal values remaining
-    # iterate through variables and call curr_domain on each one, if less than max, set as new lowest and return lowest at the end
-    all_vars = csp.get_all_unasgn_vars()
-    # print("all vars: ", all_vars)
-    # Set the min value as infinity so anything smaller will take its place
-    min_cur_domain = float('inf')
-    return_var = None
-    # Iterate through all unassigned variables
-    for var in all_vars:
-        # If the current variable has fewer legal values, set it as the new min
-        # print(str(var) + ' ' + str(var.cur_domain_size()))
-        if var.cur_domain_size() < min_cur_domain:
-            min_cur_domain = var.cur_domain_size()
-            return_var = var
-    # print("returns, ", return_var)
-    return return_var
+    md = -1
+    mv = None
 
-
-
+    for v in csp.get_all_unasgn_vars():
+        if md < 0:
+            md = v.cur_domain_size()
+            mv = v
+        elif v.cur_domain_size() < md:
+            md = v.cur_domain_size()
+            mv = v
+    csp.get_all_unasgn_vars().remove(mv)
+    return mv
