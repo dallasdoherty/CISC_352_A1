@@ -32,12 +32,12 @@
           in which case it must decide what processing to do
            prior to any variables being assigned. SEE BELOW
 
-       The propagator returns True/False and a list of (Variable, Value) pairs.
+       The propagator returns True/False and a list of (Variable, Value) tuple_valss.
        Return is False if a deadend has been detected by the propagator.
        in this case bt_search will backtrack
        return is true if we can continue.
 
-      The list of variable values pairs are all of the values
+      The list of variable values tuple_valss are all of the values
       the propagator pruned (using the variable's prune_value method).
       bt_search NEEDS to know this in order to correctly restore these
       values when it undoes a variable assignment.
@@ -83,14 +83,14 @@ def prop_BT(csp, newVar=None):
             vars = c.get_scope()
             for var in vars:
                 vals.append(var.get_assigned_value())
-            if not c.check_tuple(vals):
+            if not c.check_tuple_vals(vals):
                 return False, []
     return True, []
 
 def prop_FC(csp, newVar=None):
     '''Do forward checking. That is check constraints with
        only one uninstantiated variable. Remember to keep
-       track of all pruned variable,value pairs and return '''
+       track of all pruned variable,value tuple_valss and return '''
     #IMPLEMENT
     pruned_vals = []
     constraints = []
