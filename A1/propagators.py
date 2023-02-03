@@ -32,12 +32,12 @@
           in which case it must decide what processing to do
            prior to any variables being assigned. SEE BELOW
 
-       The propagator returns True/False and a list of (Variable, Value) pairs.
+       The propagator returns True/False and a list of (Variable, Value) tuple_valss.
        Return is False if a deadend has been detected by the propagator.
        in this case bt_search will backtrack
        return is true if we can continue.
 
-      The list of variable values pairs are all of the values
+      The list of variable values tuple_valss are all of the values
       the propagator pruned (using the variable's prune_value method).
       bt_search NEEDS to know this in order to correctly restore these
       values when it undoes a variable assignment.
@@ -83,16 +83,40 @@ def prop_BT(csp, newVar=None):
             vars = c.get_scope()
             for var in vars:
                 vals.append(var.get_assigned_value())
-            if not c.check_tuple(vals):
+            if not c.check_tuple_vals(vals):
                 return False, []
     return True, []
 
 def prop_FC(csp, newVar=None):
     '''Do forward checking. That is check constraints with
        only one uninstantiated variable. Remember to keep
-       track of all pruned variable,value pairs and return '''
+       track of all pruned variable,value tuple_valss and return '''
     #IMPLEMENT
-    pass
+    pruned = []
+    constraints = []
+    
+    # If newVar is None, forward check all constraints
+    if(newVar == None):
+        constraints = csp.get_all_cons()
+    # Otherwise only check constraints containing newVar
+    else:
+        constraints = csp.get_cons_with_var(newVar)
+    for cons in constraints:
+        # Only checking constraints that have one unassigned variable in their scope
+        if cons.get_n_unasgn() == 1:
+            var = cons.get_unasgn_vars()[0]
+            # Iterate through the other variables that are connected to var (unassigned)
+            for val in var.cur_domain():    
+                # Check if a satisfying tuple_vals exists          
+                if not cons.check_var_val(var, val):
+                    tuple_vals = (var, val)
+                    if(tuple_vals not in pruned):
+                        pruned.append(tuple_vals)
+                        var.prune_value(val)
+            # No possible assignements, this is considered failure. Now have to backtrack
+            if var.cur_domain_size() == 0:
+                return False, pruned
+    return True, pruned
 
 
 def prop_GAC(csp, newVar=None):
@@ -100,4 +124,31 @@ def prop_GAC(csp, newVar=None):
        processing all constraints. Otherwise we do GAC enforce with
        constraints containing newVar on GAC Queue'''
     #IMPLEMENT
-    pass
+    pruned = []
+    GAC_queue = []
+    
+    if(newVar == None):
+        constraints = csp.get_all_cons()
+    else:
+        constraints = csp.get_cons_with_var(newVar)
+    
+    for c in constraints:
+        GAC_queue.append(c)
+    
+    while len(GAC_queue) != 0:
+        c = GAC_queue.pop(0)
+        for var in c.get_scope():
+            for d in var.cur_domain():
+                if not c.check_var_val(var, d):
+                    tuple_vals = (var, d)
+                    if(tuple_vals not in pruned):
+                        pruned.append(tuple_vals)
+                        var.prune_value(d)
+                    if var.cur_domain_size() == 0:
+                        GAC_queue.clear()
+                        return False, pruned
+                    else:
+                        for cons in csp.get_cons_with_var(var):
+                            if (cons not in GAC_queue):
+                                GAC_queue.append(cons)
+    return True, pruned

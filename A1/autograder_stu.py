@@ -168,7 +168,7 @@ class TestNaryGrid(unittest.TestCase):
         self.assertTrue(passed, message)
         passed = False
 
-        answer_nary = []
+        answer_nary = test_nary_grid_1_answer_nary()
 
         if len(constraints_nary) == b[0] * 2:
             passed = True
@@ -216,7 +216,7 @@ class TestNaryGrid(unittest.TestCase):
         self.assertTrue(passed, message)
         passed = False
 
-        answer_nary = []
+        answer_nary = test_nary_grid_2_answer_nary()
         if len(constraints_nary) == b[0] * 2:
             passed = True
             sats = [c.sat_tuples for c in constraints_nary]
@@ -261,7 +261,7 @@ class TestNaryGrid(unittest.TestCase):
         self.assertTrue(passed, message)
         passed = False
 
-        answer_nary = []     
+        answer_nary = test_nary_grid_3_answer_nary()    
         if len(constraints_nary) == b[0] * 2:
             passed = True
             sats = [c.sat_tuples for c in constraints_nary]
@@ -311,7 +311,7 @@ class TestNaryGrid(unittest.TestCase):
             message += "Got exception %s\n" % e
             constraints_nary = []
 
-        answer_nary = []
+        answer_nary = test_nary_grid_4_answer_nary()
         if len(constraints_nary) == b[0] * 2:
             passed = True
             sats = [c.sat_tuples for c in constraints_nary]
