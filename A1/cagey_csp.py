@@ -84,10 +84,51 @@ An example of a 3x3 puzzle would be defined as:
 '''
 
 from cspbase import *
+from itertools import permutations
 
 def binary_ne_grid(cagey_grid):
-    ##IMPLEMENT
-    pass
+    grid_cells = []
+    all_vars = []
+    grid_size = cagey_grid[0]
+    # Create variable objects of the form (name, domain=[])
+    # Iterate through a n x n grid creating a variable for the coordinates of each tile, with the domain being between 1 and n
+    for i in range(grid_size):
+        # Create one column of variables, then append it to the variables list
+        col = []
+        for j in range(grid_size):
+            # Initialize a variable with i/j coordinates and a domain of 0 -> 3
+            var = Variable(str(i) + str(j), list(range(1, grid_size + 1)))
+            col.append(var)
+            # Also add this variable to a list of all variables that can be used to create the csp
+            all_vars.append(var)
+        # Append each column once it's been made to the larger 2D
+        grid_cells.append(col)
+    print(grid_cells)
+    
+    # Create a csp object with a name and the list of variables
+    csp = CSP("binary_ne_grid", all_vars)
+    # All permuations between 1 and n, which act as constraints
+    tuple_list = []
+    tuples  = permutations(list(range(1, grid_size+1)), 2)
+    for t in tuples:
+        tuple_list.append(t)
+    constraints = []
+    # Iterate through three variables to get combinations of two numbers that can access grid_cells variables
+    for i in range(grid_size):
+        for j in range(grid_size):
+            for k in range(j+1, grid_size):
+                cons = Constraint(str(grid_cells[i][j]) + ' ' +  str(grid_cells[i][j]), [grid_cells[i][j], grid_cells[i][k]])
+                # Tuple list is consistent across constraints
+                cons.add_satisfying_tuples(tuple_list)
+                # Add the constraint to the csp, along with adding the tuple list to the constraint using cspbase
+                csp.add_constraint(cons)
+                # Repeat so you two additional constraints with the same set of i, j, k
+                cons = Constraint(str(grid_cells[j][i]) + ' ' +  str(grid_cells[k][i]), [grid_cells[j][i], grid_cells[k][i]])
+                cons.add_satisfying_tuples(tuple_list)
+                csp.add_constraint(cons)
+    return csp, grid_cells
+
+
 
 
 def nary_ad_grid(cagey_grid):

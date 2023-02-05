@@ -93,13 +93,13 @@ def prop_FC(csp, newVar=None):
        track of all pruned variable,value tuple_valss and return '''
     pruned = []
     constraints = []
-    
     # If newVar is None, forward check all constraints
     if(newVar == None):
         constraints = csp.get_all_cons()
     # Otherwise only check constraints containing newVar
     else:
         constraints = csp.get_cons_with_var(newVar)
+    # Iterate through constraints
     for cons in constraints:
         # Only checking constraints that have one unassigned variable in their scope
         if cons.get_n_unasgn() == 1:
@@ -124,11 +124,12 @@ def prop_GAC(csp, newVar=None):
        constraints containing newVar on GAC Queue'''
     pruned = []
     GAC_queue = []
-    
+    # If newVar is None, check all constraints
     if(newVar == None):
         constraints = csp.get_all_cons()
+    # Otherwise only check constraints containing newVar
     else:
-        constraints = csp.get_cons_with_var(newVar)
+        constraints = csp.get_cons_with_var(newVar)  
     
     for c in constraints:
         GAC_queue.append(c)
