@@ -114,6 +114,10 @@ def binary_ne_grid(cagey_grid):
         tuple_list.append(t)
     constraints = []
     # Iterate through three variables to get combinations of two numbers that can access grid_cells variables
+    helper_function(grid_size, grid_cells, tuple_list, csp)
+    return csp, grid_cells
+
+def helper_function(grid_size, grid_cells, tuple_list, csp):
     for i in range(grid_size):
         for j in range(grid_size):
             for k in range(j+1, grid_size):
@@ -126,9 +130,6 @@ def binary_ne_grid(cagey_grid):
                 cons = Constraint(str(grid_cells[j][i]) + ' ' +  str(grid_cells[k][i]), [grid_cells[j][i], grid_cells[k][i]])
                 cons.add_satisfying_tuples(tuple_list)
                 csp.add_constraint(cons)
-    return csp, grid_cells
-
-
 
 
 def nary_ad_grid(cagey_grid):
