@@ -83,6 +83,7 @@ An example of a 3x3 puzzle would be defined as:
 
 '''
 
+import itertools
 from cspbase import *
 from itertools import permutations
 
@@ -131,10 +132,52 @@ def helper_function(grid_size, grid_cells, tuple_list, csp):
                 cons.add_satisfying_tuples(tuple_list)
                 csp.add_constraint(cons)
 
-
 def nary_ad_grid(cagey_grid):
     ## IMPLEMENT
-    pass
+    domain_arr = [] # Create domain array for varaiables
+    array_of_variables = [] # array containing vars
+    sizeOf = cagey_grid[0] # Size of the cagey grid
+
+   
+
+    for i in range(1, sizeOf+1): # Add all values between 1 - n to the domain array
+        domain_arr.append(i)
+
+    var_list = [[0]*sizeOf for i in range(sizeOf)]
+    for i in range(sizeOf):
+        for j in range(sizeOf):
+            tmp = Variable("cell(" + str(i+1) + "," + str(j+1) + ")", domain_arr)
+            var_list[i][j] = tmp
+            array_of_variables.append(tmp)
+
+    csp_nary = CSP("nary CSP", array_of_variables)
+
+    row = []
+    tuples = []
+    for i in range(sizeOf):
+        row.clear()
+        for j in range(sizeOf):
+            row.append(var_list[i][j])
+        constraint = Constraint("row" + str(i+1), row)
+        tuples.clear()
+        for t in itertools.permutations(domain_arr):
+            tuples.append(t)
+        constraint.add_satisfying_tuples(tuples)
+        csp_nary.add_constraint(constraint)
+
+    column = []
+    for i in range(sizeOf):
+        column.clear()
+        for j in range(sizeOf):
+            column.append(var_list[j][i])
+        constraint = Constraint("col" + str(i), column)
+        tuples.clear()
+        for t in itertools.permutations(domain_arr):
+            tuples.append(t)
+        constraint.add_satisfying_tuples(tuples)
+        csp_nary.add_constraint(constraint)
+
+    return csp_nary, array_of_variables
 
 def cagey_csp_model(cagey_grid):
     ##IMPLEMENT
