@@ -135,19 +135,19 @@ def prop_GAC(csp, newVar=None):
         GAC_queue.append(c)
     
     while len(GAC_queue) != 0:
-        c = GAC_queue.pop(0)
-        for var in c.get_scope():
+        c = GAC_queue.pop(0) # Remove first element
+        for var in c.get_scope(): # Iterate through variables in scope
             for d in var.cur_domain():
-                if not c.check_var_val(var, d):
+                if not c.check_var_val(var, d): # Check if a satisfying tuple_vals exists
                     tuple_vals = (var, d)
-                    if(tuple_vals not in pruned):
+                    if(tuple_vals not in pruned): # If not already pruned, prune it
                         pruned.append(tuple_vals)
                         var.prune_value(d)
-                    if var.cur_domain_size() == 0:
+                    if var.cur_domain_size() == 0: 
                         GAC_queue.clear()
                         return False, pruned
-                    else:
+                    else: # Add constraints to GAC queue
                         for cons in csp.get_cons_with_var(var):
-                            if (cons not in GAC_queue):
-                                GAC_queue.append(cons)
-    return True, pruned
+                            if (cons not in GAC_queue): # Only add if not already in queue
+                                GAC_queue.append(cons) 
+    return True, pruned # Return pruned values
