@@ -1,7 +1,7 @@
 # =============================
-# Student Names:
-# Group ID:
-# Date:
+# Student Names: Sarah, Dallas, and Alex
+# Group ID: 50
+# Date: January 31st, 2023
 # =============================
 # CISC 352 - W23
 # cagey_csp.py

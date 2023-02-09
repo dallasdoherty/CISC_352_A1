@@ -1,5 +1,5 @@
 # =============================
-# Student Names: 
+# Student Names: Sarah, Dallas, and Alex
 # Group ID: 50
 # Date: January 31st, 2023
 # =============================
